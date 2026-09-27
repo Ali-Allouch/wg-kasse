@@ -91,6 +91,24 @@ export default function Home() {
     [expenses, searchQuery, activeCategory],
   );
 
+  /* ── Unified Kasse Balance (single source of truth) ──────────── */
+
+  const kasseBalance: number = useMemo(
+    (): number => {
+      const totalDeposits: number = deposits.reduce(
+        (sum: number, dep: Deposit): number => sum + dep.amount,
+        0,
+      );
+      const kasseExpenses: number = expenses.reduce(
+        (sum: number, exp: Expense): number =>
+          exp.paidFromKasse === true ? sum + exp.amount : sum,
+        0,
+      );
+      return totalDeposits - kasseExpenses;
+    },
+    [deposits, expenses],
+  );
+
   /* ── Helpers ──────────────────────────────────────────────────── */
 
   const getRoommateName = (id: string): string => {
@@ -123,7 +141,6 @@ export default function Home() {
         activeTab={activeTab}
         onTabChange={(tab: ActiveTab): void => setActiveTab(tab)}
         onLogout={handleLogout}
-        onDeposit={(): void => setIsDepositModalOpen(true)}
       />
 
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
@@ -133,7 +150,7 @@ export default function Home() {
             <KpiMetrics
               expenses={expenses}
               roommates={roommates}
-              deposits={deposits}
+              kasseBalance={kasseBalance}
             />
 
             {/* Filters row */}

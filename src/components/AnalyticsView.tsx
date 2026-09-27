@@ -80,7 +80,7 @@ export default function AnalyticsView({
       new Date(exp.date + 'T00:00:00').getFullYear() === selectedYear,
   );
 
-  /* ── Derived: year + month filtered ─────────────────────────── */
+  /* ── Derived: year + month filtered (synchronized) ──────────── */
 
   const filteredExpenses: Expense[] = yearExpenses.filter(
     (exp: Expense): boolean => {
@@ -110,7 +110,7 @@ export default function AnalyticsView({
   }
   const maxMonthlyTotal: number = Math.max(...monthlyTotals, 1);
 
-  /* ── Derived: category distribution ─────────────────────────── */
+  /* ── Derived: category distribution (synced to filter) ──────── */
 
   const categoryTotals: Map<ExpenseCategory, number> = new Map<
     ExpenseCategory,
@@ -130,7 +130,7 @@ export default function AnalyticsView({
     0,
   );
 
-  /* ── Derived: roommate net balances ─────────────────────────── */
+  /* ── Derived: roommate net balances (synced to filter) ──────── */
 
   const balances: Map<string, number> = new Map<string, number>();
   for (const r of roommates) {
@@ -147,7 +147,7 @@ export default function AnalyticsView({
     }
   }
 
-  /* ── Derived: deposits vs kasse expenses ────────────────────── */
+  /* ── Derived: deposits vs kasse expenses (synced to filter) ─── */
 
   const totalDeposits: number = filteredDeposits.reduce(
     (sum: number, dep: Deposit): number => sum + dep.amount,
@@ -158,6 +158,7 @@ export default function AnalyticsView({
       exp.paidFromKasse === true ? sum + exp.amount : sum,
     0,
   );
+  const netKasseBalance: number = totalDeposits - totalKasseExpenses;
   const maxDepositExpense: number = Math.max(
     totalDeposits,
     totalKasseExpenses,
@@ -223,40 +224,49 @@ export default function AnalyticsView({
             Monthly Spending — {selectedYear}
           </h2>
         </div>
-        <div className="flex items-end gap-1 sm:gap-2" style={{ height: '10rem' }}>
+        <div className="h-64 border-b border-zinc-700 flex items-end gap-1 sm:gap-2">
           {monthlyTotals.map((total: number, monthIdx: number) => {
-            const heightPct: number = (total / maxMonthlyTotal) * 100;
+            const heightPct: number =
+              maxMonthlyTotal > 0 ? (total / maxMonthlyTotal) * 100 : 0;
             const isSelected: boolean =
               selectedMonth === 'all' ||
               selectedMonth === String(monthIdx);
             return (
               <div
                 key={monthIdx}
-                className="group relative flex flex-1 flex-col items-center"
+                className="group relative flex flex-1 flex-col justify-end h-full items-center"
               >
                 {/* Tooltip */}
-                <div className="pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-zinc-700 px-2 py-1 text-xs font-medium text-zinc-100 opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                <div className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-zinc-700 px-2 py-1 text-xs font-medium text-zinc-100 opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
                   {formatEur(total)}
                 </div>
                 {/* Bar */}
                 <div
-                  className={`w-full rounded-t-md transition-colors ${
+                  className={`w-full max-w-[40px] rounded-t-lg transition-all ${
                     isSelected
-                      ? 'bg-emerald-500'
-                      : 'bg-zinc-700 group-hover:bg-zinc-600'
+                      ? 'bg-emerald-500 hover:bg-emerald-400'
+                      : 'bg-zinc-700 hover:bg-zinc-600'
                   }`}
-                  style={{
-                    height: `${Math.max(heightPct, 2)}%`,
-                    minHeight: '4px',
-                  }}
+                  style={{ height: `${Math.max(heightPct, 1)}%` }}
                 />
-                {/* Label */}
-                <span className="mt-2 text-[10px] font-medium text-zinc-500 sm:text-xs">
-                  {MONTH_NAMES[monthIdx]}
-                </span>
               </div>
             );
           })}
+        </div>
+        {/* Month labels */}
+        <div className="flex gap-1 sm:gap-2 mt-2">
+          {MONTH_NAMES.map((name: string, idx: number) => (
+            <span
+              key={idx}
+              className={`flex-1 text-center text-[10px] font-medium sm:text-xs ${
+                selectedMonth === String(idx)
+                  ? 'text-emerald-400'
+                  : 'text-zinc-500'
+              }`}
+            >
+              {name}
+            </span>
+          ))}
         </div>
       </div>
 
@@ -308,12 +318,12 @@ export default function AnalyticsView({
             <span className="text-sm text-zinc-400">Net Kasse Balance</span>
             <span
               className={`text-sm font-bold ${
-                totalDeposits - totalKasseExpenses >= 0
+                netKasseBalance >= 0
                   ? 'text-emerald-400'
                   : 'text-rose-400'
               }`}
             >
-              {formatEur(totalDeposits - totalKasseExpenses)}
+              {formatEur(netKasseBalance)}
             </span>
           </div>
         </div>

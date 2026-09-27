@@ -8,14 +8,12 @@ interface NavbarProps {
   activeTab: ActiveTab;
   onTabChange: (tab: ActiveTab) => void;
   onLogout: () => void;
-  onDeposit: () => void;
 }
 
 export default function Navbar({
   activeTab,
   onTabChange,
   onLogout,
-  onDeposit,
 }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-sm">
@@ -57,23 +55,14 @@ export default function Navbar({
           </button>
         </nav>
 
-        {/* Right: Deposit + Logout */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onDeposit}
-            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
-          >
-            <Wallet className="h-4 w-4" />
-            <span className="hidden sm:inline">Einzahlung</span>
-          </button>
-          <button
-            onClick={onLogout}
-            className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Logout</span>
-          </button>
-        </div>
+        {/* Right: Logout */}
+        <button
+          onClick={onLogout}
+          className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="hidden sm:inline">Logout</span>
+        </button>
       </div>
     </header>
   );

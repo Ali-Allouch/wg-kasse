@@ -1,18 +1,18 @@
 'use client';
 
 import { Wallet, Users, Tag } from 'lucide-react';
-import type { Expense, Roommate, Deposit } from '@/types/expense';
+import type { Expense, Roommate } from '@/types/expense';
 
 interface KpiMetricsProps {
   expenses: Expense[];
   roommates: Roommate[];
-  deposits: Deposit[];
+  kasseBalance: number;
 }
 
 export default function KpiMetrics({
   expenses,
   roommates,
-  deposits,
+  kasseBalance,
 }: KpiMetricsProps) {
   const totalExpenses: number = expenses.reduce(
     (sum: number, exp: Expense): number => sum + exp.amount,
@@ -21,17 +21,6 @@ export default function KpiMetrics({
   const fairShare: number =
     roommates.length > 0 ? totalExpenses / roommates.length : 0;
   const totalEntries: number = expenses.length;
-
-  const totalDeposits: number = deposits.reduce(
-    (sum: number, dep: Deposit): number => sum + dep.amount,
-    0,
-  );
-  const kasseExpenses: number = expenses.reduce(
-    (sum: number, exp: Expense): number =>
-      exp.paidFromKasse === true ? sum + exp.amount : sum,
-    0,
-  );
-  const kasseBalance: number = totalDeposits - kasseExpenses;
 
   const formatEur = (value: number): string =>
     new Intl.NumberFormat('de-DE', {
