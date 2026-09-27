@@ -250,10 +250,10 @@ export default function AnalyticsView({
               <button
                 key={year}
                 onClick={(): void => setSelectedYear(year)}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] ${
                   selectedYear === year
-                    ? 'bg-zinc-700 text-zinc-100'
-                    : 'text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-zinc-700 text-zinc-100 shadow-sm'
+                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700/50'
                 }`}
               >
                 {year}
@@ -268,7 +268,7 @@ export default function AnalyticsView({
             onChange={(
               e: React.ChangeEvent<HTMLSelectElement>,
             ): void => setSelectedMonth(e.target.value)}
-            className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors duration-150 cursor-pointer"
           >
             <option value="all">All Year</option>
             {MONTH_NAMES.map((name: string, idx: number) => (
@@ -301,12 +301,12 @@ export default function AnalyticsView({
                 className="group relative flex flex-1 flex-col justify-end h-full items-center"
               >
                 {/* Tooltip */}
-                <div className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-zinc-700 px-2 py-1 text-xs font-medium text-zinc-100 opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                <div className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-zinc-700 px-2 py-1 text-xs font-medium text-zinc-100 opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
                   {formatEur(total)}
                 </div>
                 {/* Bar */}
                 <div
-                  className={`w-full max-w-[40px] rounded-t-lg transition-all ${
+                  className={`w-full max-w-[40px] rounded-t-lg transition-all duration-500 ease-out ${
                     isSelected
                       ? 'bg-emerald-500 hover:bg-emerald-400'
                       : 'bg-zinc-700 hover:bg-zinc-600'
@@ -322,7 +322,7 @@ export default function AnalyticsView({
           {MONTH_NAMES.map((name: string, idx: number) => (
             <span
               key={idx}
-              className={`flex-1 text-center text-[10px] font-medium sm:text-xs ${
+              className={`flex-1 text-center text-[10px] font-medium sm:text-xs transition-colors duration-300 ${
                 selectedMonth === String(idx)
                   ? 'text-emerald-400'
                   : 'text-zinc-500'
@@ -357,15 +357,15 @@ export default function AnalyticsView({
               return (
                 <li
                   key={idx}
-                  className={`flex items-center justify-between rounded-lg px-4 py-3 ${
+                  className={`flex items-center justify-between rounded-lg px-4 py-3 transition-all duration-200 ${
                     isSettled
                       ? 'bg-emerald-900/20 border border-emerald-800/40'
-                      : 'bg-zinc-800/50'
+                      : 'bg-zinc-800/50 hover:bg-zinc-800/70'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <span
-                      className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+                      className={`h-2.5 w-2.5 shrink-0 rounded-full transition-colors duration-300 ${
                         isSettled ? 'bg-emerald-400' : 'bg-amber-400'
                       }`}
                     />
@@ -381,7 +381,7 @@ export default function AnalyticsView({
                   </div>
                   <div className="flex shrink-0 items-center gap-3">
                     <span
-                      className={`text-sm font-bold ${
+                      className={`text-sm font-bold transition-colors duration-300 ${
                         isSettled
                           ? 'text-emerald-400 line-through'
                           : 'text-zinc-100'
@@ -392,7 +392,7 @@ export default function AnalyticsView({
                     {!isSettled && (
                       <button
                         onClick={(): void => handleSettleClick(s)}
-                        className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+                        className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:brightness-110 shadow-sm hover:shadow-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
                       >
                         Begleichen
                       </button>
@@ -427,7 +427,7 @@ export default function AnalyticsView({
             </div>
             <div className="h-3 overflow-hidden rounded-full bg-zinc-800">
               <div
-                className="h-full rounded-full bg-emerald-500 transition-all"
+                className="h-full rounded-full bg-emerald-500 transition-all duration-500 ease-out"
                 style={{
                   width: `${(totalDeposits / maxDepositExpense) * 100}%`,
                 }}
@@ -444,7 +444,7 @@ export default function AnalyticsView({
             </div>
             <div className="h-3 overflow-hidden rounded-full bg-zinc-800">
               <div
-                className="h-full rounded-full bg-rose-500 transition-all"
+                className="h-full rounded-full bg-rose-500 transition-all duration-500 ease-out"
                 style={{
                   width: `${(totalKasseExpenses / maxDepositExpense) * 100}%`,
                 }}
@@ -455,7 +455,7 @@ export default function AnalyticsView({
           <div className="flex items-center justify-between rounded-lg bg-zinc-800/50 px-4 py-3">
             <span className="text-sm text-zinc-400">Net Kasse Balance</span>
             <span
-              className={`text-sm font-bold ${
+              className={`text-sm font-bold transition-colors duration-300 ${
                 netKasseBalance >= 0
                   ? 'text-emerald-400'
                   : 'text-rose-400'
@@ -490,7 +490,7 @@ export default function AnalyticsView({
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
                   <div
-                    className={`h-full rounded-full ${CATEGORY_COLORS[cat]}`}
+                    className={`h-full rounded-full ${CATEGORY_COLORS[cat]} transition-all duration-500 ease-out`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
@@ -516,7 +516,7 @@ export default function AnalyticsView({
             return (
               <div
                 key={r.id}
-                className="flex items-center justify-between rounded-lg bg-zinc-800/50 px-4 py-3"
+                className="flex items-center justify-between rounded-lg bg-zinc-800/50 px-4 py-3 transition-colors duration-200 hover:bg-zinc-800/70"
               >
                 <div className="flex items-center gap-3">
                   <span className={`h-3 w-3 rounded-full ${r.color}`} />
@@ -525,7 +525,7 @@ export default function AnalyticsView({
                   </span>
                 </div>
                 <span
-                  className={`text-sm font-bold ${
+                  className={`text-sm font-bold transition-colors duration-300 ${
                     isPositive
                       ? 'text-emerald-400'
                       : isNegative

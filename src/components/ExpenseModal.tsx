@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import type { Expense, ExpenseCategory, Roommate } from '@/types/expense';
 
@@ -32,6 +32,14 @@ export default function ExpenseModal({
   );
   const [paidFromKasse, setPaidFromKasse] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect((): void => {
+    const frame: number = requestAnimationFrame((): void => {
+      setMounted(true);
+    });
+    return (): void => cancelAnimationFrame(frame);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
@@ -68,12 +76,18 @@ export default function ExpenseModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-opacity duration-200 ${
+        mounted ? 'opacity-100' : 'opacity-0'
+      }`}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="expense-modal-title"
-        className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl"
+        className={`w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl transition-all duration-200 ease-out ${
+          mounted ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+        }`}
       >
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
@@ -85,7 +99,7 @@ export default function ExpenseModal({
           </h2>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:bg-zinc-800 hover:text-zinc-200"
             aria-label="Close"
           >
             ×
@@ -115,7 +129,7 @@ export default function ExpenseModal({
                 e: React.ChangeEvent<HTMLInputElement>,
               ): void => setTitle(e.target.value)}
               placeholder="e.g. Supermarkt"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors duration-150"
             />
           </div>
 
@@ -137,7 +151,7 @@ export default function ExpenseModal({
                 e: React.ChangeEvent<HTMLInputElement>,
               ): void => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors duration-150"
             />
           </div>
 
@@ -155,7 +169,7 @@ export default function ExpenseModal({
               onChange={(
                 e: React.ChangeEvent<HTMLSelectElement>,
               ): void => setCategory(e.target.value as ExpenseCategory)}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors duration-150 cursor-pointer"
             >
               {CATEGORIES.map((cat: ExpenseCategory) => (
                 <option key={cat} value={cat}>
@@ -176,10 +190,10 @@ export default function ExpenseModal({
                   key={r.id}
                   type="button"
                   onClick={(): void => setPaidById(r.id)}
-                  className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] ${
                     paidById === r.id
-                      ? 'border-emerald-500 bg-emerald-600/20 text-emerald-300'
-                      : 'border-zinc-700 bg-zinc-800 text-zinc-300 hover:border-zinc-600'
+                      ? 'border-emerald-500 bg-emerald-600/20 text-emerald-300 shadow-sm'
+                      : 'border-zinc-700 bg-zinc-800 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-700/50'
                   }`}
                 >
                   <span className={`h-2.5 w-2.5 rounded-full ${r.color}`} />
@@ -190,14 +204,14 @@ export default function ExpenseModal({
           </div>
 
           {/* Paid from Kasse */}
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300 select-none">
             <input
               type="checkbox"
               checked={paidFromKasse}
               onChange={(
                 e: React.ChangeEvent<HTMLInputElement>,
               ): void => setPaidFromKasse(e.target.checked)}
-              className="h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-500 focus:ring-emerald-500"
+              className="h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-500 focus:ring-emerald-500 transition-colors duration-150 cursor-pointer"
             />
             Paid from WG-Kasse
           </label>
@@ -205,7 +219,7 @@ export default function ExpenseModal({
           {/* Submit */}
           <button
             type="submit"
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:brightness-110 shadow-sm hover:shadow-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
           >
             <Plus className="h-4 w-4" />
             Add Expense

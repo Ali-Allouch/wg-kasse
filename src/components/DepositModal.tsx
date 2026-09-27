@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import type { Deposit, Roommate } from '@/types/expense';
 
@@ -24,6 +24,14 @@ export default function DepositModal({
   );
   const [note, setNote] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect((): void => {
+    const frame: number = requestAnimationFrame((): void => {
+      setMounted(true);
+    });
+    return (): void => cancelAnimationFrame(frame);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
@@ -56,12 +64,18 @@ export default function DepositModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-opacity duration-200 ${
+        mounted ? 'opacity-100' : 'opacity-0'
+      }`}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="deposit-modal-title"
-        className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl"
+        className={`w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl transition-all duration-200 ease-out ${
+          mounted ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+        }`}
       >
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
@@ -73,7 +87,7 @@ export default function DepositModal({
           </h2>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:bg-zinc-800 hover:text-zinc-200"
             aria-label="Close"
           >
             ×
@@ -98,10 +112,10 @@ export default function DepositModal({
                   key={r.id}
                   type="button"
                   onClick={(): void => setRoommateId(r.id)}
-                  className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] ${
                     roommateId === r.id
-                      ? 'border-emerald-500 bg-emerald-600/20 text-emerald-300'
-                      : 'border-zinc-700 bg-zinc-800 text-zinc-300 hover:border-zinc-600'
+                      ? 'border-emerald-500 bg-emerald-600/20 text-emerald-300 shadow-sm'
+                      : 'border-zinc-700 bg-zinc-800 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-700/50'
                   }`}
                 >
                   <span className={`h-2.5 w-2.5 rounded-full ${r.color}`} />
@@ -129,7 +143,7 @@ export default function DepositModal({
                 e: React.ChangeEvent<HTMLInputElement>,
               ): void => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors duration-150"
             />
           </div>
 
@@ -148,7 +162,7 @@ export default function DepositModal({
               onChange={(
                 e: React.ChangeEvent<HTMLInputElement>,
               ): void => setDate(e.target.value)}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors duration-150 cursor-pointer"
             />
           </div>
 
@@ -168,14 +182,14 @@ export default function DepositModal({
                 e: React.ChangeEvent<HTMLInputElement>,
               ): void => setNote(e.target.value)}
               placeholder="e.g. Monatsbeitrag"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors duration-150"
             />
           </div>
 
           {/* Submit */}
           <button
             type="submit"
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:brightness-110 shadow-sm hover:shadow-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
           >
             <Plus className="h-4 w-4" />
             Einzahlung erfassen

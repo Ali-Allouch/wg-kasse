@@ -54,6 +54,7 @@ export default function Home() {
   const [activeCategory, setActiveCategory] =
     useState<ExpenseCategory | 'All'>('All');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const roommates: Roommate[] = ROOMMATES;
 
@@ -107,11 +108,16 @@ export default function Home() {
 
   const handleConfirmDelete = (): void => {
     if (deleteConfirmId !== null) {
-      setExpenses(
-        (prev: Expense[]): Expense[] =>
-          prev.filter((e: Expense): boolean => e.id !== deleteConfirmId),
-      );
+      const idToRemove: string = deleteConfirmId;
       setDeleteConfirmId(null);
+      setDeletingId(idToRemove);
+      setTimeout((): void => {
+        setExpenses(
+          (prev: Expense[]): Expense[] =>
+            prev.filter((e: Expense): boolean => e.id !== idToRemove),
+        );
+        setDeletingId(null);
+      }, 300);
     }
   };
 
@@ -146,6 +152,7 @@ export default function Home() {
     setSearchQuery('');
     setActiveCategory('All');
     setDeleteConfirmId(null);
+    setDeletingId(null);
     try {
       localStorage.removeItem(STORAGE_KEY_EXPENSES);
       localStorage.removeItem(STORAGE_KEY_DEPOSITS);
@@ -160,6 +167,7 @@ export default function Home() {
     setSearchQuery('');
     setActiveCategory('All');
     setDeleteConfirmId(null);
+    setDeletingId(null);
   };
 
   /* ── Derived values ───────────────────────────────────────────── */
@@ -245,10 +253,10 @@ export default function Home() {
               <div className="overflow-x-auto no-scrollbar flex space-x-2 pb-1">
                 <button
                   onClick={(): void => setActiveCategory('All')}
-                  className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                  className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] ${
                     activeCategory === 'All'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
+                      ? 'bg-emerald-600 text-white shadow-sm hover:shadow-emerald-500/10'
+                      : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700'
                   }`}
                 >
                   All
@@ -257,10 +265,10 @@ export default function Home() {
                   <button
                     key={cat}
                     onClick={(): void => setActiveCategory(cat)}
-                    className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                    className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] ${
                       activeCategory === cat
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
+                        ? 'bg-emerald-600 text-white shadow-sm hover:shadow-emerald-500/10'
+                        : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700'
                     }`}
                   >
                     {cat}
@@ -277,19 +285,19 @@ export default function Home() {
                     e: React.ChangeEvent<HTMLInputElement>,
                   ): void => setSearchQuery(e.target.value)}
                   placeholder="Search expenses…"
-                  className="w-full sm:w-48 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full sm:w-48 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors duration-150"
                 />
                 <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-3">
                   <button
                     onClick={(): void => setIsDepositModalOpen(true)}
-                    className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-emerald-600/50 bg-emerald-600/10 px-4 py-2 text-sm font-semibold text-emerald-400 transition-colors hover:bg-emerald-600/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                    className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-emerald-600/50 bg-emerald-600/10 px-4 py-2 text-sm font-semibold text-emerald-400 transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:brightness-110 shadow-sm hover:shadow-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
                   >
                     <Wallet className="h-4 w-4" />
                     Einzahlung
                   </button>
                   <button
                     onClick={(): void => setIsModalOpen(true)}
-                    className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                    className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:brightness-110 shadow-sm hover:shadow-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
                   >
                     <Plus className="h-4 w-4" />
                     Ausgabe
@@ -311,73 +319,83 @@ export default function Home() {
                 </div>
               ) : (
                 <ul className="divide-y divide-zinc-800">
-                  {filteredExpenses.map((exp: Expense) => (
-                    <li
-                      key={exp.id}
-                      className="flex items-center justify-between gap-3 px-4 sm:px-5 py-3 sm:py-4 transition-colors hover:bg-zinc-800/40"
-                    >
-                      {/* Left: dot + title + subtitle */}
-                      <div className="flex min-w-0 flex-1 items-center gap-3">
-                        <span
-                          className={`h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0 rounded-full ${CATEGORY_COLORS[exp.category]}`}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-zinc-100">
-                            {exp.title}
-                            {exp.paidFromKasse === true && (
-                              <span className="ml-1.5 sm:ml-2 inline-block rounded-full bg-emerald-600/20 px-1.5 sm:px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
-                                Kasse
-                              </span>
-                            )}
-                          </p>
-                          <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-zinc-400">
-                            <span>{formatDate(exp.date)}</span>
-                            <span className="text-zinc-600">·</span>
-                            <span>{exp.category}</span>
-                            <span className="text-zinc-600">·</span>
-                            <span>
-                              Paid by {getRoommateName(exp.paidById)}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
+                  {filteredExpenses.map((exp: Expense) => {
+                    const isDeleting: boolean = deletingId === exp.id;
+                    const isConfirming: boolean = deleteConfirmId === exp.id;
+                    return (
+                      <li
+                        key={exp.id}
+                        className={`transition-all duration-300 ease-out overflow-hidden ${
+                          isDeleting
+                            ? 'max-h-0 py-0 my-0 opacity-0 translate-x-4'
+                            : 'max-h-20 py-3 sm:py-4 opacity-100 translate-x-0'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-3 px-4 sm:px-5 transition-colors duration-150 hover:bg-zinc-800/40">
+                          {/* Left: dot + title + subtitle */}
+                          <div className="flex min-w-0 flex-1 items-center gap-3">
+                            <span
+                              className={`h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0 rounded-full ${CATEGORY_COLORS[exp.category]}`}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-medium text-zinc-100">
+                                {exp.title}
+                                {exp.paidFromKasse === true && (
+                                  <span className="ml-1.5 sm:ml-2 inline-block rounded-full bg-emerald-600/20 px-1.5 sm:px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                                    Kasse
+                                  </span>
+                                )}
+                              </p>
+                              <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-zinc-400">
+                                <span>{formatDate(exp.date)}</span>
+                                <span className="text-zinc-600">·</span>
+                                <span>{exp.category}</span>
+                                <span className="text-zinc-600">·</span>
+                                <span>
+                                  Paid by {getRoommateName(exp.paidById)}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
 
-                      {/* Right: amount + delete / confirm */}
-                      {deleteConfirmId === exp.id ? (
-                        <div className="flex shrink-0 items-center gap-2">
-                          <span className="hidden sm:flex items-center gap-1 text-xs text-amber-400">
-                            <AlertCircle className="h-3.5 w-3.5" />
-                            Löschen bestätigen?
-                          </span>
-                          <button
-                            onClick={handleConfirmDelete}
-                            className="rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-500"
-                          >
-                            Ja
-                          </button>
-                          <button
-                            onClick={handleCancelDelete}
-                            className="rounded-lg border border-zinc-600 px-2.5 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
-                          >
-                            Nein
-                          </button>
+                          {/* Right: amount + delete / confirm */}
+                          {isConfirming ? (
+                            <div className="flex shrink-0 items-center gap-2">
+                              <span className="hidden sm:flex items-center gap-1 text-xs text-amber-400">
+                                <AlertCircle className="h-3.5 w-3.5" />
+                                Löschen bestätigen?
+                              </span>
+                              <button
+                                onClick={handleConfirmDelete}
+                                className="rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:brightness-110 shadow-sm hover:shadow-red-500/10"
+                              >
+                                Ja
+                              </button>
+                              <button
+                                onClick={handleCancelDelete}
+                                className="rounded-lg border border-zinc-600 px-2.5 py-1.5 text-xs font-medium text-zinc-300 transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:bg-zinc-700"
+                              >
+                                Nein
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                              <span className="text-sm font-bold text-zinc-100 whitespace-nowrap">
+                                {formatEur(exp.amount)}
+                              </span>
+                              <button
+                                onClick={(): void => handleRequestDelete(exp.id)}
+                                className="rounded-lg p-1.5 sm:p-2 text-zinc-500 transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:bg-red-900/30 hover:text-red-400"
+                                aria-label={`Delete ${exp.title}`}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-                          <span className="text-sm font-bold text-zinc-100 whitespace-nowrap">
-                            {formatEur(exp.amount)}
-                          </span>
-                          <button
-                            onClick={(): void => handleRequestDelete(exp.id)}
-                            className="rounded-lg p-1.5 sm:p-2 text-zinc-500 transition-colors hover:bg-red-900/30 hover:text-red-400"
-                            aria-label={`Delete ${exp.title}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      )}
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
@@ -400,7 +418,7 @@ export default function Home() {
           </p>
           <button
             onClick={handleReset}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-all duration-150 ease-out cursor-pointer select-none active:scale-[0.98] hover:bg-zinc-700 hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             Reset to Demo Data

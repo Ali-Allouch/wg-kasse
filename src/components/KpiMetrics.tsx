@@ -31,7 +31,7 @@ export default function KpiMetrics({
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {/* Total Expenses */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5">
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5 transition-all duration-200 hover:border-zinc-700/80">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-600/20">
             <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
@@ -48,7 +48,7 @@ export default function KpiMetrics({
       </div>
 
       {/* Fair Share */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5">
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5 transition-all duration-200 hover:border-zinc-700/80">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
             <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
@@ -65,7 +65,7 @@ export default function KpiMetrics({
       </div>
 
       {/* Total Entries */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5">
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5 transition-all duration-200 hover:border-zinc-700/80">
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg bg-violet-600/20">
             <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-violet-400" />
@@ -82,7 +82,7 @@ export default function KpiMetrics({
       </div>
 
       {/* WG-Kasse Bestand */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5">
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5 transition-all duration-200 hover:border-zinc-700/80">
         <div className="flex items-center gap-2 sm:gap-3">
           <div
             className={`flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg ${
