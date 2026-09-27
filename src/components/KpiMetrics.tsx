@@ -1,14 +1,19 @@
 'use client';
 
 import { Wallet, Users, Tag } from 'lucide-react';
-import type { Expense, Roommate } from '@/types/expense';
+import type { Expense, Roommate, Deposit } from '@/types/expense';
 
 interface KpiMetricsProps {
   expenses: Expense[];
   roommates: Roommate[];
+  deposits: Deposit[];
 }
 
-export default function KpiMetrics({ expenses, roommates }: KpiMetricsProps) {
+export default function KpiMetrics({
+  expenses,
+  roommates,
+  deposits,
+}: KpiMetricsProps) {
   const totalExpenses: number = expenses.reduce(
     (sum: number, exp: Expense): number => sum + exp.amount,
     0,
@@ -17,6 +22,17 @@ export default function KpiMetrics({ expenses, roommates }: KpiMetricsProps) {
     roommates.length > 0 ? totalExpenses / roommates.length : 0;
   const totalEntries: number = expenses.length;
 
+  const totalDeposits: number = deposits.reduce(
+    (sum: number, dep: Deposit): number => sum + dep.amount,
+    0,
+  );
+  const kasseExpenses: number = expenses.reduce(
+    (sum: number, exp: Expense): number =>
+      exp.paidFromKasse === true ? sum + exp.amount : sum,
+    0,
+  );
+  const kasseBalance: number = totalDeposits - kasseExpenses;
+
   const formatEur = (value: number): string =>
     new Intl.NumberFormat('de-DE', {
       style: 'currency',
@@ -24,11 +40,11 @@ export default function KpiMetrics({ expenses, roommates }: KpiMetricsProps) {
     }).format(value);
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {/* Total Expenses */}
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-600/20">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-600/20">
             <Wallet className="h-5 w-5 text-emerald-400" />
           </div>
           <div>
@@ -45,7 +61,7 @@ export default function KpiMetrics({ expenses, roommates }: KpiMetricsProps) {
       {/* Fair Share */}
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600/20">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
             <Users className="h-5 w-5 text-blue-400" />
           </div>
           <div>
@@ -62,7 +78,7 @@ export default function KpiMetrics({ expenses, roommates }: KpiMetricsProps) {
       {/* Total Entries */}
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-600/20">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-violet-600/20">
             <Tag className="h-5 w-5 text-violet-400" />
           </div>
           <div>
@@ -70,6 +86,37 @@ export default function KpiMetrics({ expenses, roommates }: KpiMetricsProps) {
               Total Entries
             </p>
             <p className="text-2xl font-bold text-zinc-100">{totalEntries}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* WG-Kasse Bestand */}
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+        <div className="flex items-center gap-3">
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+              kasseBalance >= 0
+                ? 'bg-emerald-600/20'
+                : 'bg-rose-600/20'
+            }`}
+          >
+            <Wallet
+              className={`h-5 w-5 ${
+                kasseBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'
+              }`}
+            />
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+              WG-Kasse Bestand
+            </p>
+            <p
+              className={`text-2xl font-bold ${
+                kasseBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'
+              }`}
+            >
+              {formatEur(kasseBalance)}
+            </p>
           </div>
         </div>
       </div>

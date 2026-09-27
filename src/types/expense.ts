@@ -20,4 +20,13 @@ export interface Expense {
   paidById: string;
   date: string;
   splitWith: string[];
+  paidFromKasse?: boolean;
+}
+
+export interface Deposit {
+  id: string;
+  roommateId: string;
+  amount: number;
+  date: string;
+  note?: string;
 }

@@ -1,13 +1,23 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
-import type { Expense, ExpenseCategory, Roommate } from '@/types/expense';
-import { ROOMMATES, SEED_EXPENSES } from '@/lib/mockData';
+import { Plus, Trash2, Wallet } from 'lucide-react';
+import type {
+  Expense,
+  ExpenseCategory,
+  Roommate,
+  Deposit,
+} from '@/types/expense';
+import {
+  ROOMMATES,
+  SEED_EXPENSES,
+  MOCK_DEPOSITS,
+} from '@/lib/mockData';
 import PinGate from '@/components/PinGate';
 import Navbar, { type ActiveTab } from '@/components/Navbar';
 import KpiMetrics from '@/components/KpiMetrics';
 import ExpenseModal from '@/components/ExpenseModal';
+import DepositModal from '@/components/DepositModal';
 import AnalyticsView from '@/components/AnalyticsView';
 
 const CATEGORIES: ExpenseCategory[] = [
@@ -32,7 +42,10 @@ export default function Home() {
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [expenses, setExpenses] = useState<Expense[]>(SEED_EXPENSES);
+  const [deposits, setDeposits] = useState<Deposit[]>(MOCK_DEPOSITS);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isDepositModalOpen, setIsDepositModalOpen] =
+    useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCategory, setActiveCategory] =
     useState<ExpenseCategory | 'All'>('All');
@@ -50,6 +63,10 @@ export default function Home() {
       (prev: Expense[]): Expense[] =>
         prev.filter((e: Expense): boolean => e.id !== id),
     );
+  };
+
+  const handleAddDeposit = (deposit: Deposit): void => {
+    setDeposits((prev: Deposit[]): Deposit[] => [deposit, ...prev]);
   };
 
   const handleLogout = (): void => {
@@ -106,13 +123,18 @@ export default function Home() {
         activeTab={activeTab}
         onTabChange={(tab: ActiveTab): void => setActiveTab(tab)}
         onLogout={handleLogout}
+        onDeposit={(): void => setIsDepositModalOpen(true)}
       />
 
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
         {activeTab === 'overview' ? (
           <>
             {/* KPI Metrics */}
-            <KpiMetrics expenses={expenses} roommates={roommates} />
+            <KpiMetrics
+              expenses={expenses}
+              roommates={roommates}
+              deposits={deposits}
+            />
 
             {/* Filters row */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -143,7 +165,7 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Search + Add */}
+              {/* Search + Deposit + Add */}
               <div className="flex items-center gap-3">
                 <input
                   type="text"
@@ -154,6 +176,13 @@ export default function Home() {
                   placeholder="Search expenses…"
                   className="w-48 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
+                <button
+                  onClick={(): void => setIsDepositModalOpen(true)}
+                  className="flex items-center gap-2 rounded-lg border border-emerald-600/50 bg-emerald-600/10 px-4 py-2 text-sm font-semibold text-emerald-400 transition-colors hover:bg-emerald-600/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                >
+                  <Wallet className="h-4 w-4" />
+                  Einzahlung
+                </button>
                 <button
                   onClick={(): void => setIsModalOpen(true)}
                   className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
@@ -189,6 +218,11 @@ export default function Home() {
                         <div>
                           <p className="text-sm font-medium text-zinc-100">
                             {exp.title}
+                            {exp.paidFromKasse === true && (
+                              <span className="ml-2 rounded-full bg-emerald-600/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                                Kasse
+                              </span>
+                            )}
                           </p>
                           <p className="text-xs text-zinc-400">
                             {formatDate(exp.date)} · {exp.category} · Paid by{' '}
@@ -215,7 +249,11 @@ export default function Home() {
             </div>
           </>
         ) : (
-          <AnalyticsView expenses={expenses} roommates={roommates} />
+          <AnalyticsView
+            expenses={expenses}
+            roommates={roommates}
+            deposits={deposits}
+          />
         )}
       </main>
 
@@ -225,6 +263,15 @@ export default function Home() {
           roommates={roommates}
           onAdd={handleAddExpense}
           onClose={(): void => setIsModalOpen(false)}
+        />
+      )}
+
+      {/* Deposit Modal */}
+      {isDepositModalOpen && (
+        <DepositModal
+          roommates={roommates}
+          onAdd={handleAddDeposit}
+          onClose={(): void => setIsDepositModalOpen(false)}
         />
       )}
     </div>

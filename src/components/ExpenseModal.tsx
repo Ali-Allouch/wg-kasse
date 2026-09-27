@@ -30,6 +30,7 @@ export default function ExpenseModal({
   const [paidById, setPaidById] = useState<string>(
     roommates.length > 0 ? roommates[0].id : '',
   );
+  const [paidFromKasse, setPaidFromKasse] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
@@ -59,6 +60,7 @@ export default function ExpenseModal({
       paidById,
       date: new Date().toISOString().slice(0, 10),
       splitWith: roommates.map((r: Roommate): string => r.id),
+      paidFromKasse: paidFromKasse || undefined,
     };
 
     onAdd(newExpense);
@@ -67,10 +69,20 @@ export default function ExpenseModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="expense-modal-title"
+        className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl"
+      >
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-zinc-100">New Expense</h2>
+          <h2
+            id="expense-modal-title"
+            className="text-lg font-bold text-zinc-100"
+          >
+            New Expense
+          </h2>
           <button
             onClick={onClose}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
@@ -176,6 +188,19 @@ export default function ExpenseModal({
               ))}
             </div>
           </div>
+
+          {/* Paid from Kasse */}
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
+            <input
+              type="checkbox"
+              checked={paidFromKasse}
+              onChange={(
+                e: React.ChangeEvent<HTMLInputElement>,
+              ): void => setPaidFromKasse(e.target.checked)}
+              className="h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-500 focus:ring-emerald-500"
+            />
+            Paid from WG-Kasse
+          </label>
 
           {/* Submit */}
           <button

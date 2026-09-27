@@ -1,4 +1,4 @@
-import type { Roommate, Expense } from '@/types/expense';
+import type { Roommate, Expense, Deposit } from '@/types/expense';
 
 export const ROOMMATES: Roommate[] = [
   { id: 'ali', name: 'Ali', color: 'bg-blue-500' },
@@ -8,8 +8,143 @@ export const ROOMMATES: Roommate[] = [
 ];
 
 export const SEED_EXPENSES: Expense[] = [
+  // ── November 2025 ──────────────────────────────────────────────
   {
     id: 'exp-001',
+    title: 'Miete November',
+    amount: 1200.0,
+    category: 'Utilities',
+    paidById: 'ali',
+    date: '2025-11-01',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+  },
+  {
+    id: 'exp-002',
+    title: 'Supermarkt',
+    amount: 72.3,
+    category: 'Groceries',
+    paidById: 'sophie',
+    date: '2025-11-05',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+  },
+  {
+    id: 'exp-003',
+    title: 'Strom & Internet',
+    amount: 88.0,
+    category: 'Utilities',
+    paidById: 'lukas',
+    date: '2025-11-08',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+    paidFromKasse: true,
+  },
+  // ── Dezember 2025 ──────────────────────────────────────────────
+  {
+    id: 'exp-004',
+    title: 'Miete Dezember',
+    amount: 1200.0,
+    category: 'Utilities',
+    paidById: 'ali',
+    date: '2025-12-01',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+  },
+  {
+    id: 'exp-005',
+    title: 'Weihnachtsessen',
+    amount: 156.8,
+    category: 'Other',
+    paidById: 'jonas',
+    date: '2025-12-18',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+  },
+  {
+    id: 'exp-006',
+    title: 'Strom & Internet',
+    amount: 92.0,
+    category: 'Utilities',
+    paidById: 'lukas',
+    date: '2025-12-05',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+    paidFromKasse: true,
+  },
+  // ── Januar 2026 ────────────────────────────────────────────────
+  {
+    id: 'exp-007',
+    title: 'Miete Januar',
+    amount: 1200.0,
+    category: 'Utilities',
+    paidById: 'ali',
+    date: '2026-01-01',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+  },
+  {
+    id: 'exp-008',
+    title: 'Supermarkt',
+    amount: 94.2,
+    category: 'Groceries',
+    paidById: 'sophie',
+    date: '2026-01-04',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+  },
+  {
+    id: 'exp-009',
+    title: 'Strom & Internet',
+    amount: 95.0,
+    category: 'Utilities',
+    paidById: 'lukas',
+    date: '2026-01-07',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+    paidFromKasse: true,
+  },
+  {
+    id: 'exp-010',
+    title: 'Kaffee & Tee',
+    amount: 22.5,
+    category: 'Drinks',
+    paidById: 'jonas',
+    date: '2026-01-12',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+  },
+  // ── Februar 2026 ───────────────────────────────────────────────
+  {
+    id: 'exp-011',
+    title: 'Miete Februar',
+    amount: 1200.0,
+    category: 'Utilities',
+    paidById: 'ali',
+    date: '2026-02-01',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+  },
+  {
+    id: 'exp-012',
+    title: 'Supermarkt',
+    amount: 81.6,
+    category: 'Groceries',
+    paidById: 'sophie',
+    date: '2026-02-03',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+  },
+  {
+    id: 'exp-013',
+    title: 'Strom & Internet',
+    amount: 91.0,
+    category: 'Utilities',
+    paidById: 'lukas',
+    date: '2026-02-06',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+    paidFromKasse: true,
+  },
+  {
+    id: 'exp-014',
+    title: 'Reinigungsmittel',
+    amount: 28.4,
+    category: 'Household',
+    paidById: 'jonas',
+    date: '2026-02-10',
+    splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+  },
+  // ── März 2026 ──────────────────────────────────────────────────
+  {
+    id: 'exp-015',
     title: 'Miete März',
     amount: 1200.0,
     category: 'Utilities',
@@ -18,7 +153,7 @@ export const SEED_EXPENSES: Expense[] = [
     splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
   },
   {
-    id: 'exp-002',
+    id: 'exp-016',
     title: 'Supermarkt',
     amount: 87.45,
     category: 'Groceries',
@@ -27,16 +162,17 @@ export const SEED_EXPENSES: Expense[] = [
     splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
   },
   {
-    id: 'exp-003',
+    id: 'exp-017',
     title: 'Strom & Internet',
     amount: 95.0,
     category: 'Utilities',
     paidById: 'lukas',
     date: '2026-03-05',
     splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
+    paidFromKasse: true,
   },
   {
-    id: 'exp-004',
+    id: 'exp-018',
     title: 'Kaffee & Tee',
     amount: 24.9,
     category: 'Drinks',
@@ -45,7 +181,7 @@ export const SEED_EXPENSES: Expense[] = [
     splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
   },
   {
-    id: 'exp-005',
+    id: 'exp-019',
     title: 'Reinigungsmittel',
     amount: 32.8,
     category: 'Household',
@@ -54,7 +190,7 @@ export const SEED_EXPENSES: Expense[] = [
     splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
   },
   {
-    id: 'exp-006',
+    id: 'exp-020',
     title: 'Kühlschrank-Reparatur',
     amount: 145.0,
     category: 'Repairs',
@@ -63,7 +199,7 @@ export const SEED_EXPENSES: Expense[] = [
     splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
   },
   {
-    id: 'exp-007',
+    id: 'exp-021',
     title: 'Bier & Snacks',
     amount: 42.5,
     category: 'Drinks',
@@ -72,7 +208,7 @@ export const SEED_EXPENSES: Expense[] = [
     splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
   },
   {
-    id: 'exp-008',
+    id: 'exp-022',
     title: 'Wochenmarkt',
     amount: 56.3,
     category: 'Groceries',
@@ -81,7 +217,7 @@ export const SEED_EXPENSES: Expense[] = [
     splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
   },
   {
-    id: 'exp-009',
+    id: 'exp-023',
     title: 'Toilettenpapier & Seife',
     amount: 18.75,
     category: 'Household',
@@ -90,7 +226,7 @@ export const SEED_EXPENSES: Expense[] = [
     splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
   },
   {
-    id: 'exp-010',
+    id: 'exp-024',
     title: 'Gas & Heizung',
     amount: 110.0,
     category: 'Utilities',
@@ -98,4 +234,32 @@ export const SEED_EXPENSES: Expense[] = [
     date: '2026-03-22',
     splitWith: ['ali', 'lukas', 'sophie', 'jonas'],
   },
+];
+
+export const MOCK_DEPOSITS: Deposit[] = [
+  // ── November 2025 ──────────────────────────────────────────────
+  { id: 'dep-001', roommateId: 'ali', amount: 50.0, date: '2025-11-01', note: 'Monatsbeitrag' },
+  { id: 'dep-002', roommateId: 'lukas', amount: 50.0, date: '2025-11-01', note: 'Monatsbeitrag' },
+  { id: 'dep-003', roommateId: 'sophie', amount: 50.0, date: '2025-11-01', note: 'Monatsbeitrag' },
+  { id: 'dep-004', roommateId: 'jonas', amount: 50.0, date: '2025-11-01', note: 'Monatsbeitrag' },
+  // ── Dezember 2025 ──────────────────────────────────────────────
+  { id: 'dep-005', roommateId: 'ali', amount: 50.0, date: '2025-12-01', note: 'Monatsbeitrag' },
+  { id: 'dep-006', roommateId: 'lukas', amount: 50.0, date: '2025-12-01', note: 'Monatsbeitrag' },
+  { id: 'dep-007', roommateId: 'sophie', amount: 50.0, date: '2025-12-01', note: 'Monatsbeitrag' },
+  { id: 'dep-008', roommateId: 'jonas', amount: 50.0, date: '2025-12-01', note: 'Monatsbeitrag' },
+  // ── Januar 2026 ────────────────────────────────────────────────
+  { id: 'dep-009', roommateId: 'ali', amount: 50.0, date: '2026-01-01', note: 'Monatsbeitrag' },
+  { id: 'dep-010', roommateId: 'lukas', amount: 50.0, date: '2026-01-01', note: 'Monatsbeitrag' },
+  { id: 'dep-011', roommateId: 'sophie', amount: 50.0, date: '2026-01-01', note: 'Monatsbeitrag' },
+  { id: 'dep-012', roommateId: 'jonas', amount: 50.0, date: '2026-01-01', note: 'Monatsbeitrag' },
+  // ── Februar 2026 ───────────────────────────────────────────────
+  { id: 'dep-013', roommateId: 'ali', amount: 50.0, date: '2026-02-01', note: 'Monatsbeitrag' },
+  { id: 'dep-014', roommateId: 'lukas', amount: 50.0, date: '2026-02-01', note: 'Monatsbeitrag' },
+  { id: 'dep-015', roommateId: 'sophie', amount: 50.0, date: '2026-02-01', note: 'Monatsbeitrag' },
+  { id: 'dep-016', roommateId: 'jonas', amount: 50.0, date: '2026-02-01', note: 'Monatsbeitrag' },
+  // ── März 2026 ──────────────────────────────────────────────────
+  { id: 'dep-017', roommateId: 'ali', amount: 50.0, date: '2026-03-01', note: 'Monatsbeitrag' },
+  { id: 'dep-018', roommateId: 'lukas', amount: 50.0, date: '2026-03-01', note: 'Monatsbeitrag' },
+  { id: 'dep-019', roommateId: 'sophie', amount: 50.0, date: '2026-03-01', note: 'Monatsbeitrag' },
+  { id: 'dep-020', roommateId: 'jonas', amount: 50.0, date: '2026-03-01', note: 'Monatsbeitrag' },
 ];
