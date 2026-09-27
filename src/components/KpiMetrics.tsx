@@ -29,18 +29,18 @@ export default function KpiMetrics({
     }).format(value);
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {/* Total Expenses */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-600/20">
-            <Wallet className="h-5 w-5 text-emerald-400" />
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-600/20">
+            <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
           </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-zinc-400 truncate">
               Total Expenses
             </p>
-            <p className="text-2xl font-bold text-zinc-100">
+            <p className="text-lg sm:text-2xl font-bold text-zinc-100 truncate">
               {formatEur(totalExpenses)}
             </p>
           </div>
@@ -48,16 +48,16 @@ export default function KpiMetrics({
       </div>
 
       {/* Fair Share */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
-            <Users className="h-5 w-5 text-blue-400" />
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
+            <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
           </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-zinc-400 truncate">
               Fair Share / Person
             </p>
-            <p className="text-2xl font-bold text-zinc-100">
+            <p className="text-lg sm:text-2xl font-bold text-zinc-100 truncate">
               {formatEur(fairShare)}
             </p>
           </div>
@@ -65,42 +65,44 @@ export default function KpiMetrics({
       </div>
 
       {/* Total Entries */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-violet-600/20">
-            <Tag className="h-5 w-5 text-violet-400" />
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg bg-violet-600/20">
+            <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-violet-400" />
           </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-zinc-400 truncate">
               Total Entries
             </p>
-            <p className="text-2xl font-bold text-zinc-100">{totalEntries}</p>
+            <p className="text-lg sm:text-2xl font-bold text-zinc-100">
+              {totalEntries}
+            </p>
           </div>
         </div>
       </div>
 
       {/* WG-Kasse Bestand */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
-        <div className="flex items-center gap-3">
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-3 sm:p-5">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+            className={`flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg ${
               kasseBalance >= 0
                 ? 'bg-emerald-600/20'
                 : 'bg-rose-600/20'
             }`}
           >
             <Wallet
-              className={`h-5 w-5 ${
+              className={`h-4 w-4 sm:h-5 sm:w-5 ${
                 kasseBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'
               }`}
             />
           </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-zinc-400">
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-zinc-400 truncate">
               WG-Kasse Bestand
             </p>
             <p
-              className={`text-2xl font-bold ${
+              className={`text-lg sm:text-2xl font-bold truncate ${
                 kasseBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'
               }`}
             >

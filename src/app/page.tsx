@@ -143,7 +143,7 @@ export default function Home() {
         onLogout={handleLogout}
       />
 
-      <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-7xl space-y-4 sm:space-y-6 px-3 sm:px-6 py-4 sm:py-6">
         {activeTab === 'overview' ? (
           <>
             {/* KPI Metrics */}
@@ -154,12 +154,12 @@ export default function Home() {
             />
 
             {/* Filters row */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              {/* Category pills */}
-              <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              {/* Category pills – horizontal scroll on mobile */}
+              <div className="overflow-x-auto no-scrollbar flex space-x-2 pb-1">
                 <button
                   onClick={(): void => setActiveCategory('All')}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                  className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                     activeCategory === 'All'
                       ? 'bg-emerald-600 text-white'
                       : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
@@ -171,7 +171,7 @@ export default function Home() {
                   <button
                     key={cat}
                     onClick={(): void => setActiveCategory(cat)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                    className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                       activeCategory === cat
                         ? 'bg-emerald-600 text-white'
                         : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
@@ -182,8 +182,8 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Search + Deposit + Add */}
-              <div className="flex items-center gap-3">
+              {/* Search + Action buttons */}
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                 <input
                   type="text"
                   value={searchQuery}
@@ -191,34 +191,36 @@ export default function Home() {
                     e: React.ChangeEvent<HTMLInputElement>,
                   ): void => setSearchQuery(e.target.value)}
                   placeholder="Search expenses…"
-                  className="w-48 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="w-full sm:w-48 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
-                <button
-                  onClick={(): void => setIsDepositModalOpen(true)}
-                  className="flex items-center gap-2 rounded-lg border border-emerald-600/50 bg-emerald-600/10 px-4 py-2 text-sm font-semibold text-emerald-400 transition-colors hover:bg-emerald-600/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
-                >
-                  <Wallet className="h-4 w-4" />
-                  Einzahlung
-                </button>
-                <button
-                  onClick={(): void => setIsModalOpen(true)}
-                  className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add
-                </button>
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-3">
+                  <button
+                    onClick={(): void => setIsDepositModalOpen(true)}
+                    className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-emerald-600/50 bg-emerald-600/10 px-4 py-2 text-sm font-semibold text-emerald-400 transition-colors hover:bg-emerald-600/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                  >
+                    <Wallet className="h-4 w-4" />
+                    Einzahlung
+                  </button>
+                  <button
+                    onClick={(): void => setIsModalOpen(true)}
+                    className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Ausgabe
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Transactions list */}
             <div className="rounded-xl border border-zinc-800 bg-zinc-900">
-              <div className="border-b border-zinc-800 px-5 py-4">
+              <div className="border-b border-zinc-800 px-4 sm:px-5 py-3 sm:py-4">
                 <h2 className="text-base font-semibold text-zinc-100">
                   Transactions
                 </h2>
               </div>
               {filteredExpenses.length === 0 ? (
-                <div className="px-5 py-10 text-center text-sm text-zinc-500">
+                <div className="px-4 sm:px-5 py-10 text-center text-sm text-zinc-500">
                   No expenses found.
                 </div>
               ) : (
@@ -226,34 +228,42 @@ export default function Home() {
                   {filteredExpenses.map((exp: Expense) => (
                     <li
                       key={exp.id}
-                      className="flex items-center justify-between px-5 py-4 transition-colors hover:bg-zinc-800/40"
+                      className="flex items-center justify-between gap-3 px-4 sm:px-5 py-3 sm:py-4 transition-colors hover:bg-zinc-800/40"
                     >
-                      <div className="flex items-center gap-4">
+                      {/* Left: dot + title + subtitle */}
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
                         <span
-                          className={`h-3 w-3 shrink-0 rounded-full ${CATEGORY_COLORS[exp.category]}`}
+                          className={`h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0 rounded-full ${CATEGORY_COLORS[exp.category]}`}
                         />
-                        <div>
-                          <p className="text-sm font-medium text-zinc-100">
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-zinc-100">
                             {exp.title}
                             {exp.paidFromKasse === true && (
-                              <span className="ml-2 rounded-full bg-emerald-600/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                              <span className="ml-1.5 sm:ml-2 inline-block rounded-full bg-emerald-600/20 px-1.5 sm:px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
                                 Kasse
                               </span>
                             )}
                           </p>
-                          <p className="text-xs text-zinc-400">
-                            {formatDate(exp.date)} · {exp.category} · Paid by{' '}
-                            {getRoommateName(exp.paidById)}
+                          <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-zinc-400">
+                            <span>{formatDate(exp.date)}</span>
+                            <span className="text-zinc-600">·</span>
+                            <span>{exp.category}</span>
+                            <span className="text-zinc-600">·</span>
+                            <span>
+                              Paid by {getRoommateName(exp.paidById)}
+                            </span>
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <span className="text-sm font-bold text-zinc-100">
+
+                      {/* Right: amount + delete */}
+                      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                        <span className="text-sm font-bold text-zinc-100 whitespace-nowrap">
                           {formatEur(exp.amount)}
                         </span>
                         <button
                           onClick={(): void => handleDeleteExpense(exp.id)}
-                          className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-red-900/30 hover:text-red-400"
+                          className="rounded-lg p-1.5 sm:p-2 text-zinc-500 transition-colors hover:bg-red-900/30 hover:text-red-400"
                           aria-label={`Delete ${exp.title}`}
                         >
                           <Trash2 className="h-4 w-4" />
