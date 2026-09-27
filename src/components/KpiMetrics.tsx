@@ -37,10 +37,10 @@ export default function KpiMetrics({
             <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-zinc-400 truncate">
+            <p className="text-[11px] leading-tight font-semibold tracking-wider text-zinc-400 uppercase">
               Total Expenses
             </p>
-            <p className="text-lg sm:text-2xl font-bold text-zinc-100 truncate">
+            <p className="text-lg sm:text-2xl font-bold text-zinc-100">
               {formatEur(totalExpenses)}
             </p>
           </div>
@@ -54,10 +54,10 @@ export default function KpiMetrics({
             <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-zinc-400 truncate">
+            <p className="text-[11px] leading-tight font-semibold tracking-wider text-zinc-400 uppercase">
               Fair Share / Person
             </p>
-            <p className="text-lg sm:text-2xl font-bold text-zinc-100 truncate">
+            <p className="text-lg sm:text-2xl font-bold text-zinc-100">
               {formatEur(fairShare)}
             </p>
           </div>
@@ -71,7 +71,7 @@ export default function KpiMetrics({
             <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-violet-400" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-zinc-400 truncate">
+            <p className="text-[11px] leading-tight font-semibold tracking-wider text-zinc-400 uppercase">
               Total Entries
             </p>
             <p className="text-lg sm:text-2xl font-bold text-zinc-100">
@@ -98,11 +98,11 @@ export default function KpiMetrics({
             />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-zinc-400 truncate">
+            <p className="text-[11px] leading-tight font-semibold tracking-wider text-zinc-400 uppercase">
               WG-Kasse Bestand
             </p>
             <p
-              className={`text-lg sm:text-2xl font-bold truncate ${
+              className={`text-lg sm:text-2xl font-bold ${
                 kasseBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'
               }`}
             >

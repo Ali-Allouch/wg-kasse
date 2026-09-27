@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Plus, Trash2, Wallet } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { Plus, Trash2, Wallet, RefreshCw, AlertCircle } from 'lucide-react';
 import type {
   Expense,
   ExpenseCategory,
@@ -38,7 +38,11 @@ const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
   Other: 'bg-zinc-500',
 };
 
+const STORAGE_KEY_EXPENSES = 'wgkasse_expenses';
+const STORAGE_KEY_DEPOSITS = 'wgkasse_deposits';
+
 export default function Home() {
+  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [expenses, setExpenses] = useState<Expense[]>(SEED_EXPENSES);
@@ -49,8 +53,47 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCategory, setActiveCategory] =
     useState<ExpenseCategory | 'All'>('All');
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const roommates: Roommate[] = ROOMMATES;
+
+  /* ── LocalStorage Hydration ─────────────────────────────────── */
+
+  useEffect((): void => {
+    try {
+      const storedExpenses: string | null = localStorage.getItem(
+        STORAGE_KEY_EXPENSES,
+      );
+      const storedDeposits: string | null = localStorage.getItem(
+        STORAGE_KEY_DEPOSITS,
+      );
+      if (storedExpenses) {
+        const parsed: unknown = JSON.parse(storedExpenses);
+        if (Array.isArray(parsed)) {
+          setExpenses(parsed as Expense[]);
+        }
+      }
+      if (storedDeposits) {
+        const parsed: unknown = JSON.parse(storedDeposits);
+        if (Array.isArray(parsed)) {
+          setDeposits(parsed as Deposit[]);
+        }
+      }
+    } catch {
+      // fall back to seed data silently
+    }
+    setIsMounted(true);
+  }, []);
+
+  useEffect((): void => {
+    if (!isMounted) return;
+    try {
+      localStorage.setItem(STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
+      localStorage.setItem(STORAGE_KEY_DEPOSITS, JSON.stringify(deposits));
+    } catch {
+      // storage full or unavailable – ignore
+    }
+  }, [expenses, deposits, isMounted]);
 
   /* ── Handlers ─────────────────────────────────────────────────── */
 
@@ -58,15 +101,57 @@ export default function Home() {
     setExpenses((prev: Expense[]): Expense[] => [expense, ...prev]);
   };
 
-  const handleDeleteExpense = (id: string): void => {
-    setExpenses(
-      (prev: Expense[]): Expense[] =>
-        prev.filter((e: Expense): boolean => e.id !== id),
-    );
+  const handleRequestDelete = (id: string): void => {
+    setDeleteConfirmId(id);
+  };
+
+  const handleConfirmDelete = (): void => {
+    if (deleteConfirmId !== null) {
+      setExpenses(
+        (prev: Expense[]): Expense[] =>
+          prev.filter((e: Expense): boolean => e.id !== deleteConfirmId),
+      );
+      setDeleteConfirmId(null);
+    }
+  };
+
+  const handleCancelDelete = (): void => {
+    setDeleteConfirmId(null);
   };
 
   const handleAddDeposit = (deposit: Deposit): void => {
     setDeposits((prev: Deposit[]): Deposit[] => [deposit, ...prev]);
+  };
+
+  const handleSettle = (
+    fromId: string,
+    toId: string,
+    amount: number,
+  ): void => {
+    const newExpense: Expense = {
+      id: `exp-settle-${Date.now()}`,
+      title: 'Ausgleichszahlung',
+      amount: Math.round(amount * 100) / 100,
+      category: 'Other',
+      paidById: fromId,
+      date: new Date().toISOString().slice(0, 10),
+      splitWith: [toId],
+    };
+    setExpenses((prev: Expense[]): Expense[] => [newExpense, ...prev]);
+  };
+
+  const handleReset = (): void => {
+    setExpenses(SEED_EXPENSES);
+    setDeposits(MOCK_DEPOSITS);
+    setSearchQuery('');
+    setActiveCategory('All');
+    setDeleteConfirmId(null);
+    try {
+      localStorage.removeItem(STORAGE_KEY_EXPENSES);
+      localStorage.removeItem(STORAGE_KEY_DEPOSITS);
+    } catch {
+      // ignore
+    }
   };
 
   const handleLogout = (): void => {
@@ -74,6 +159,7 @@ export default function Home() {
     setActiveTab('overview');
     setSearchQuery('');
     setActiveCategory('All');
+    setDeleteConfirmId(null);
   };
 
   /* ── Derived values ───────────────────────────────────────────── */
@@ -136,14 +222,14 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">
       <Navbar
         activeTab={activeTab}
         onTabChange={(tab: ActiveTab): void => setActiveTab(tab)}
         onLogout={handleLogout}
       />
 
-      <main className="mx-auto max-w-7xl space-y-4 sm:space-y-6 px-3 sm:px-6 py-4 sm:py-6">
+      <main className="mx-auto w-full max-w-7xl flex-1 space-y-4 sm:space-y-6 px-3 sm:px-6 py-4 sm:py-6">
         {activeTab === 'overview' ? (
           <>
             {/* KPI Metrics */}
@@ -256,19 +342,40 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* Right: amount + delete */}
-                      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-                        <span className="text-sm font-bold text-zinc-100 whitespace-nowrap">
-                          {formatEur(exp.amount)}
-                        </span>
-                        <button
-                          onClick={(): void => handleDeleteExpense(exp.id)}
-                          className="rounded-lg p-1.5 sm:p-2 text-zinc-500 transition-colors hover:bg-red-900/30 hover:text-red-400"
-                          aria-label={`Delete ${exp.title}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
+                      {/* Right: amount + delete / confirm */}
+                      {deleteConfirmId === exp.id ? (
+                        <div className="flex shrink-0 items-center gap-2">
+                          <span className="hidden sm:flex items-center gap-1 text-xs text-amber-400">
+                            <AlertCircle className="h-3.5 w-3.5" />
+                            Löschen bestätigen?
+                          </span>
+                          <button
+                            onClick={handleConfirmDelete}
+                            className="rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-500"
+                          >
+                            Ja
+                          </button>
+                          <button
+                            onClick={handleCancelDelete}
+                            className="rounded-lg border border-zinc-600 px-2.5 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
+                          >
+                            Nein
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                          <span className="text-sm font-bold text-zinc-100 whitespace-nowrap">
+                            {formatEur(exp.amount)}
+                          </span>
+                          <button
+                            onClick={(): void => handleRequestDelete(exp.id)}
+                            className="rounded-lg p-1.5 sm:p-2 text-zinc-500 transition-colors hover:bg-red-900/30 hover:text-red-400"
+                            aria-label={`Delete ${exp.title}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -280,9 +387,26 @@ export default function Home() {
             expenses={expenses}
             roommates={roommates}
             deposits={deposits}
+            onSettle={handleSettle}
           />
         )}
       </main>
+
+      {/* Footer with Reset */}
+      <footer className="border-t border-zinc-800 bg-zinc-950 py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-3 sm:px-6">
+          <p className="text-xs text-zinc-500">
+            WGKasse · WG Lindenstraße 42
+          </p>
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            Reset to Demo Data
+          </button>
+        </div>
+      </footer>
 
       {/* Add Expense Modal */}
       {isModalOpen && (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PieChart, Users } from 'lucide-react';
+import { PieChart, Users, ArrowRightLeft, CheckCircle } from 'lucide-react';
 import type {
   Expense,
   ExpenseCategory,
@@ -13,6 +13,7 @@ interface AnalyticsViewProps {
   expenses: Expense[];
   roommates: Roommate[];
   deposits: Deposit[];
+  onSettle: (fromId: string, toId: string, amount: number) => void;
 }
 
 const CATEGORIES: ExpenseCategory[] = [
@@ -48,10 +49,17 @@ const MONTH_NAMES: string[] = [
   'Dez',
 ];
 
+interface Settlement {
+  fromId: string;
+  toId: string;
+  amount: number;
+}
+
 export default function AnalyticsView({
   expenses,
   roommates,
   deposits,
+  onSettle,
 }: AnalyticsViewProps) {
   const [selectedYear, setSelectedYear] = useState<number>(() => {
     const years: number[] = expenses.map(
@@ -61,6 +69,7 @@ export default function AnalyticsView({
     return years.length > 0 ? Math.max(...years) : new Date().getFullYear();
   });
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [settledIds, setSettledIds] = useState<Set<string>>(new Set());
 
   /* ── Derived: available years ───────────────────────────────── */
 
@@ -147,6 +156,44 @@ export default function AnalyticsView({
     }
   }
 
+  /* ── Derived: debt settlements (greedy matching) ────────────── */
+
+  const settlements: Settlement[] = (() => {
+    const creditors: { id: string; amount: number }[] = [];
+    const debtors: { id: string; amount: number }[] = [];
+
+    for (const r of roommates) {
+      const bal: number = balances.get(r.id) ?? 0;
+      if (bal > 0.005) {
+        creditors.push({ id: r.id, amount: bal });
+      } else if (bal < -0.005) {
+        debtors.push({ id: r.id, amount: -bal });
+      }
+    }
+
+    creditors.sort((a, b) => b.amount - a.amount);
+    debtors.sort((a, b) => b.amount - a.amount);
+
+    const result: Settlement[] = [];
+    let i = 0;
+    let j = 0;
+
+    while (i < creditors.length && j < debtors.length) {
+      const pay: number = Math.min(creditors[i].amount, debtors[j].amount);
+      result.push({
+        fromId: debtors[j].id,
+        toId: creditors[i].id,
+        amount: Math.round(pay * 100) / 100,
+      });
+      creditors[i].amount -= pay;
+      debtors[j].amount -= pay;
+      if (creditors[i].amount < 0.005) i++;
+      if (debtors[j].amount < 0.005) j++;
+    }
+
+    return result;
+  })();
+
   /* ── Derived: deposits vs kasse expenses (synced to filter) ─── */
 
   const totalDeposits: number = filteredDeposits.reduce(
@@ -172,6 +219,23 @@ export default function AnalyticsView({
       style: 'currency',
       currency: 'EUR',
     }).format(value);
+
+  const getRoommateName = (id: string): string => {
+    const r: Roommate | undefined = roommates.find(
+      (rm: Roommate): boolean => rm.id === id,
+    );
+    return r ? r.name : 'Unknown';
+  };
+
+  const handleSettleClick = (s: Settlement): void => {
+    const key: string = `${s.fromId}-${s.toId}-${s.amount}`;
+    onSettle(s.fromId, s.toId, s.amount);
+    setSettledIds((prev: Set<string>): Set<string> => {
+      const next: Set<string> = new Set(prev);
+      next.add(key);
+      return next;
+    });
+  };
 
   /* ── Render ─────────────────────────────────────────────────── */
 
@@ -268,6 +332,80 @@ export default function AnalyticsView({
             </span>
           ))}
         </div>
+      </div>
+
+      {/* Wer zahlt an wen? – Debt Settlement */}
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <ArrowRightLeft className="h-5 w-5 text-amber-400" />
+          <h2 className="text-base font-semibold text-zinc-100">
+            Wer zahlt an wen?
+          </h2>
+        </div>
+        {settlements.length === 0 ? (
+          <div className="flex items-center gap-2 rounded-lg bg-emerald-900/20 px-4 py-3">
+            <CheckCircle className="h-4 w-4 text-emerald-400" />
+            <span className="text-sm text-emerald-300">
+              Alles ausgeglichen – niemand muss jemandem etwas zahlen.
+            </span>
+          </div>
+        ) : (
+          <ul className="space-y-3">
+            {settlements.map((s: Settlement, idx: number) => {
+              const key: string = `${s.fromId}-${s.toId}-${s.amount}`;
+              const isSettled: boolean = settledIds.has(key);
+              return (
+                <li
+                  key={idx}
+                  className={`flex items-center justify-between rounded-lg px-4 py-3 ${
+                    isSettled
+                      ? 'bg-emerald-900/20 border border-emerald-800/40'
+                      : 'bg-zinc-800/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span
+                      className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+                        isSettled ? 'bg-emerald-400' : 'bg-amber-400'
+                      }`}
+                    />
+                    <span className="text-sm text-zinc-200 truncate">
+                      <span className="font-semibold">
+                        {getRoommateName(s.fromId)}
+                      </span>{' '}
+                      zahlt{' '}
+                      <span className="font-semibold">
+                        {getRoommateName(s.toId)}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <span
+                      className={`text-sm font-bold ${
+                        isSettled
+                          ? 'text-emerald-400 line-through'
+                          : 'text-zinc-100'
+                      }`}
+                    >
+                      {formatEur(s.amount)}
+                    </span>
+                    {!isSettled && (
+                      <button
+                        onClick={(): void => handleSettleClick(s)}
+                        className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+                      >
+                        Begleichen
+                      </button>
+                    )}
+                    {isSettled && (
+                      <CheckCircle className="h-4 w-4 text-emerald-400" />
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
 
       {/* Deposits vs Expenses Summary */}
